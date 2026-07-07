@@ -1,0 +1,43 @@
+name: Day Trading Simulator
+
+on:
+  schedule:
+    # Every 30 min, 00:00-06:30 UTC = 09:00-15:30 JST (TSE hours), Mon-Fri.
+    # Note: GitHub Actions schedules only run on the default branch, and do
+    # not account for JPX holidays (the script itself only skips weekends).
+    - cron: "0,30 0-6 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: day-trading-simulator
+  cancel-in-progress: false
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run trading cycle
+        run: python -m trader.run
+
+      - name: Commit updated data
+        run: |
+          git config user.name "day-trading-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "chore: update trading data ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+            git push origin HEAD:${{ github.ref_name }}
+          fi

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>デイトレ・シミュレーター</title>
+<link rel="stylesheet" href="style.css" />
+<script src="vendor/chart.umd.js"></script>
+<script src="vendor/luxon.js"></script>
+<script src="vendor/chartjs-adapter-luxon.umd.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>デイトレ・シミュレーター（仮想資金）</h1>
+      <div class="subtitle">日本株・ルールベース売買AI / 最終更新: <span id="last-updated">-</span></div>
+    </div>
+  </header>
+
+  <div class="stat-row" id="stat-row"></div>
+
+  <div class="card">
+    <h2>資産推移</h2>
+    <div class="card-sub">現金 + 保有株評価額の合計</div>
+    <div class="chart-box"><canvas id="equity-chart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>保有・取引銘柄チャート</h2>
+    <div class="card-sub">買い（▲）・売り（▼）のタイミングを株価チャート上に表示</div>
+    <div id="symbol-charts" class="grid-2"></div>
+  </div>
+
+  <div class="card">
+    <h2>取引履歴</h2>
+    <div id="trade-log"></div>
+  </div>
+
+  <footer>
+    データ: Yahoo Finance (yfinance) / GitHub Actions で30分毎に自動実行。売買判断はルールベースの疑似AI（移動平均クロス・RSI・トレーリングストップ）で、実運用資金は一切使用していません。
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
