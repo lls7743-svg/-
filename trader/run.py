@@ -2,40 +2,13 @@
 the scheduled GitHub Actions workflow (see .github/workflows/trade.yml)."""
 from __future__ import annotations
 
-import datetime as dt
-import json
-
 from . import config
+from .chart_data import save_price_history, update_prices_index
 from .data import fetch_history_batch, is_market_open, now_jst
 from .portfolio import Portfolio, append_trades, append_equity_point, DATA_DIR
 from .strategy import decide_and_execute
 
 PRICES_DIR = DATA_DIR / "prices"
-
-
-def _save_price_history(symbol: str, df) -> None:
-    PRICES_DIR.mkdir(parents=True, exist_ok=True)
-    cutoff = df.index.max() - dt.timedelta(days=config.PRICE_HISTORY_KEEP_DAYS)
-    trimmed = df[df.index >= cutoff]
-    bars = [
-        {
-            "t": ts.isoformat(),
-            "o": round(float(row.open), 2),
-            "h": round(float(row.high), 2),
-            "l": round(float(row.low), 2),
-            "c": round(float(row.close), 2),
-        }
-        for ts, row in trimmed.iterrows()
-    ]
-    path = PRICES_DIR / f"{symbol}.json"
-    path.write_text(json.dumps({"symbol": symbol, "bars": bars}, ensure_ascii=False, indent=2))
-
-
-def _update_prices_index(symbols: list[str]) -> None:
-    path = PRICES_DIR / "index.json"
-    existing = set(json.loads(path.read_text())) if path.exists() else set()
-    existing.update(symbols)
-    path.write_text(json.dumps(sorted(existing), ensure_ascii=False, indent=2))
 
 
 def main() -> None:
@@ -66,8 +39,8 @@ def main() -> None:
     for symbol in relevant_symbols:
         df = market_data.get(symbol)
         if df is not None and not df.empty:
-            _save_price_history(symbol, df)
-    _update_prices_index(list(relevant_symbols))
+            save_price_history(PRICES_DIR, symbol, df)
+    update_prices_index(PRICES_DIR, list(relevant_symbols))
 
     last_prices = {sym: float(df["close"].iloc[-1]) for sym, df in market_data.items()}
     append_equity_point(now_iso, portfolio.equity(last_prices))

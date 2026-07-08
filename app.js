@@ -1,13 +1,28 @@
+// Chart x-axes should always read in JST, not the viewer's local timezone.
+if (window.luxon) luxon.Settings.defaultZone = "Asia/Tokyo";
+
 const REASON_LABELS = {
   golden_cross: "ゴールデンクロス（買い）",
   stop_loss: "損切り",
   trailing_take_profit: "利益確定（トレーリング）",
+  bearish_reversal_pattern: "反転パターン（陰線包み足/流れ星）",
   dead_cross: "デッドクロス",
   day_trade_close: "大引け前の手仕舞い",
 };
 
+// ?data=backtest points the same dashboard at data/backtest/ instead of data/,
+// so backtested trades can be reviewed on the same charts as live trades.
+const DATA_BASE = new URLSearchParams(location.search).get("data") === "backtest"
+  ? "data/backtest"
+  : "data";
+const IS_BACKTEST = DATA_BASE !== "data";
+
 const fmtYen = (n) => "¥" + Math.round(n).toLocaleString("ja-JP");
 const fmtPct = (n) => (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+// Always render in JST regardless of the viewer's own timezone -- this is a
+// Japan-market app, so times should read the same on any device.
+const fmtDateTime = (iso) =>
+  new Date(iso).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
 
 async function fetchJSON(path) {
   const res = await fetch(`${path}?_=${Date.now()}`);
@@ -50,7 +65,7 @@ function renderStats(portfolio, lastPrices) {
   row.appendChild(statTile("リターン", fmtPct(returnPct), returnPct >= 0 ? "good" : "critical"));
 
   document.getElementById("last-updated").textContent = portfolio.last_updated
-    ? new Date(portfolio.last_updated).toLocaleString("ja-JP")
+    ? fmtDateTime(portfolio.last_updated)
     : "まだ実行されていません";
 }
 
@@ -203,7 +218,7 @@ function renderTradeLog(trades) {
     .reverse()
     .map((t) => {
       const badge = t.side === "BUY" ? '<span class="badge buy">買</span>' : '<span class="badge sell">売</span>';
-      const time = new Date(t.time).toLocaleString("ja-JP");
+      const time = fmtDateTime(t.time);
       const reason = REASON_LABELS[t.reason] ?? t.reason ?? "-";
       const pnl = t.pnl != null ? fmtYen(t.pnl) : "-";
       const pnlClass = t.pnl > 0 ? "good" : t.pnl < 0 ? "critical" : "";
@@ -224,18 +239,25 @@ function renderTradeLog(trades) {
 }
 
 async function main() {
+  if (IS_BACKTEST) {
+    document.querySelector("h1").textContent = "デイトレ・シミュレーター（バックテスト結果）";
+    document.querySelector(".subtitle").innerHTML =
+      '過去データに現在の戦略ロジックを当てはめた結果（参考値・将来の成績を保証するものではありません） / ' +
+      '最終データ時点: <span id="last-updated">-</span> / <a href="index.html">ライブ運用の結果に戻る</a>';
+  }
+
   const [portfolio, trades, equityPoints, symbolIndex] = await Promise.all([
-    fetchJSON("data/portfolio.json"),
-    fetchJSON("data/trades.json"),
-    fetchJSON("data/equity.json"),
-    fetchJSON("data/prices/index.json"),
+    fetchJSON(`${DATA_BASE}/portfolio.json`),
+    fetchJSON(`${DATA_BASE}/trades.json`),
+    fetchJSON(`${DATA_BASE}/equity.json`),
+    fetchJSON(`${DATA_BASE}/prices/index.json`),
   ]);
 
   const pricesBySymbol = {};
   await Promise.all(
     symbolIndex.map(async (symbol) => {
       try {
-        pricesBySymbol[symbol] = await fetchJSON(`data/prices/${symbol}.json`);
+        pricesBySymbol[symbol] = await fetchJSON(`${DATA_BASE}/prices/${symbol}.json`);
       } catch (e) {
         console.warn(`price history missing for ${symbol}`, e);
       }

@@ -1,0 +1,12 @@
+{
+  "period_start": "2024-01-08T09:00:00+09:00",
+  "period_end": "2024-01-09T04:30:00+09:00",
+  "symbols_scanned": 2,
+  "initial_cash": 1000000.0,
+  "final_equity": 1000000.0,
+  "return_pct": 0.0,
+  "num_round_trips": 0,
+  "win_rate_pct": null,
+  "total_realized_pnl": 0,
+  "still_open_positions": 0
+}

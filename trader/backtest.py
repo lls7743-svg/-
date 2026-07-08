@@ -8,16 +8,26 @@ Finance exposes -- treat the output as a rough sanity check of the strategy's
 recent behavior, not a long-run track record. Past performance here does not
 predict future results, and this does not model slippage, spreads, or the
 possibility that a signal's price wasn't actually fillable.
+
+Besides the printed summary, this writes the same trades/portfolio/price
+JSON shape the live dashboard reads (under data/backtest/) so the backtested
+trades can be viewed as buy/sell markers on real charts, the same way live
+trades are: open index.html?data=backtest.
 """
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from typing import Callable
 
 from . import config
+from .chart_data import save_price_history, update_prices_index
 from .data import fetch_history_batch
-from .portfolio import Portfolio
+from .portfolio import Portfolio, DATA_DIR
 from .strategy import decide_and_execute
+
+BACKTEST_DIR = DATA_DIR / "backtest"
+PRICES_DIR = BACKTEST_DIR / "prices"
 
 
 def run_backtest(
@@ -54,7 +64,7 @@ def run_backtest(
     wins = [tr for tr in closed if tr["pnl"] > 0]
     final_equity = equity_curve[-1]["equity"] if equity_curve else portfolio.initial_cash
 
-    return {
+    summary = {
         "period_start": timestamps[0].isoformat() if timestamps else None,
         "period_end": timestamps[-1].isoformat() if timestamps else None,
         "symbols_scanned": len(symbols),
@@ -66,6 +76,34 @@ def run_backtest(
         "total_realized_pnl": round(sum(tr["pnl"] for tr in closed), 2),
         "still_open_positions": len(portfolio.positions),
     }
+
+    _save_dashboard_output(portfolio, trade_log, equity_curve, all_data, summary)
+    return summary
+
+
+def _save_dashboard_output(portfolio, trade_log, equity_curve, all_data, summary) -> None:
+    BACKTEST_DIR.mkdir(parents=True, exist_ok=True)
+
+    payload = {
+        "cash": portfolio.cash,
+        "initial_cash": portfolio.initial_cash,
+        "realized_pnl": portfolio.realized_pnl,
+        "positions": {sym: asdict(pos) for sym, pos in portfolio.positions.items()},
+        "last_updated": equity_curve[-1]["t"] if equity_curve else None,
+    }
+    (BACKTEST_DIR / "portfolio.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2))
+    (BACKTEST_DIR / "trades.json").write_text(json.dumps(trade_log, ensure_ascii=False, indent=2))
+    (BACKTEST_DIR / "equity.json").write_text(json.dumps(equity_curve, ensure_ascii=False, indent=2))
+    (BACKTEST_DIR / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2))
+
+    # Only chart the symbols that actually traded (or ended up held), same
+    # rationale as the live run: no need for chart JSON on every scanned name.
+    relevant_symbols = set(portfolio.positions.keys()) | {t["symbol"] for t in trade_log}
+    for symbol in relevant_symbols:
+        df = all_data.get(symbol)
+        if df is not None and not df.empty:
+            save_price_history(PRICES_DIR, symbol, df, keep_days=None)
+    update_prices_index(PRICES_DIR, list(relevant_symbols))
 
 
 def main() -> None:
