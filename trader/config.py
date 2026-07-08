@@ -82,8 +82,8 @@ TAKE_PROFIT_ARM_PCT = 0.02    # once price is +2% from entry, arm the trailing s
 TRAILING_STOP_PCT = 0.02      # once armed, sell if price drops 2% from its post-entry high
 
 # Data
-INTERVAL = "5m"
-LOOKBACK_PERIOD = "60d"  # Yahoo Finance's 5m intraday history limit is also 60 days
+INTERVAL = "15m"
+LOOKBACK_PERIOD = "60d"  # Yahoo Finance's 15m intraday history limit is also 60 days
 PRICE_HISTORY_KEEP_DAYS = 20  # rolling window kept in data/prices/<symbol>.json
 
 # Market hours (JST) - approximate, does not account for JPX holidays

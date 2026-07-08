@@ -2,10 +2,11 @@ name: Day Trading Simulator
 
 on:
   schedule:
-    # Every 30 min, 00:00-06:30 UTC = 09:00-15:30 JST (TSE hours), Mon-Fri.
-    # Note: GitHub Actions schedules only run on the default branch, and do
+    # Every 15 min, 00:00-06:45 UTC = 09:00-15:45 JST (covers TSE hours plus
+    # one harmless post-close tick), Mon-Fri. GitHub Actions schedules can be
+    # delayed under load and only run on the default branch; this also does
     # not account for JPX holidays (the script itself only skips weekends).
-    - cron: "0,30 0-6 * * 1-5"
+    - cron: "0,15,30,45 0-6 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
