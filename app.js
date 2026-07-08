@@ -10,6 +10,8 @@ const REASON_LABELS = {
   day_trade_close: "大引け前の手仕舞い",
   new_high_breakout: "直近高値更新（買い）",
   new_low_exit: "直近安値割れ（手仕舞い）",
+  trend_up: "上昇トレンド転換（買い）",
+  trend_down: "下降トレンド転換（手仕舞い）",
 };
 
 // ?data=<name> points the same dashboard at data/<name>/ instead of data/, so
@@ -17,6 +19,7 @@ const REASON_LABELS = {
 const ALT_DATA_LABELS = {
   backtest: "バックテスト結果（ルールベース戦略）",
   breakout_backtest: "高値更新ブレイクアウト検証（日足・6ヶ月）",
+  trend_backtest: "上昇トレンド追随検証（日足・6ヶ月）",
 };
 const DATA_PARAM = new URLSearchParams(location.search).get("data");
 const DATA_BASE = DATA_PARAM ? `data/${DATA_PARAM}` : "data";

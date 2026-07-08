@@ -1,0 +1,34 @@
+name: Trend Following Hypothesis Backtest
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run trend-following backtest
+        run: python -m trader.trend_backtest
+
+      - name: Commit backtest output
+        run: |
+          git config user.name "day-trading-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/trend_backtest/
+          if git diff --cached --quiet; then
+            echo "No backtest output changes to commit."
+          else
+            git commit -m "chore: update trend-following backtest results ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
