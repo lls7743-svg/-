@@ -1,0 +1,12 @@
+{
+  "period_start": "2026-04-10T09:00:00+09:00",
+  "period_end": "2026-07-08T12:30:00+09:00",
+  "symbols_scanned": 159,
+  "initial_cash": 1000000.0,
+  "final_equity": 997069.99,
+  "return_pct": -0.29,
+  "num_round_trips": 50,
+  "win_rate_pct": 34.0,
+  "total_realized_pnl": -2930.01,
+  "still_open_positions": 0
+}
