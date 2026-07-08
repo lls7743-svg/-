@@ -1,0 +1,294 @@
+[
+  {
+    "time": "2026-03-09T00:00:00",
+    "symbol": "6869.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1555.5,
+    "cash_after": 844450.0,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-03-11T00:00:00",
+    "symbol": "3092.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1176.0,
+    "cash_after": 726850.0,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-03-11T00:00:00",
+    "symbol": "9434.T",
+    "side": "BUY",
+    "qty": 900,
+    "price": 216.89999389648438,
+    "cash_after": 531640.0054931641,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-03-13T00:00:00",
+    "symbol": "4689.T",
+    "side": "BUY",
+    "qty": 400,
+    "price": 398.20001220703125,
+    "cash_after": 372360.00061035156,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-03-24T00:00:00",
+    "symbol": "6869.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1356.0,
+    "cash_after": 507960.00061035156,
+    "pnl": -19950.0,
+    "reason": "trend_down",
+    "entry_price": 1555.5
+  },
+  {
+    "time": "2026-03-25T00:00:00",
+    "symbol": "3092.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1111.0,
+    "cash_after": 619060.0006103516,
+    "pnl": -6500.0,
+    "reason": "trend_down",
+    "entry_price": 1176.0
+  },
+  {
+    "time": "2026-04-01T00:00:00",
+    "symbol": "7733.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1565.0,
+    "cash_after": 462560.00061035156,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-04-03T00:00:00",
+    "symbol": "2801.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1558.0,
+    "cash_after": 306760.00061035156,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-04-06T00:00:00",
+    "symbol": "4689.T",
+    "side": "SELL",
+    "qty": 400,
+    "price": 391.70001220703125,
+    "cash_after": 463440.00549316406,
+    "pnl": -2600.0,
+    "reason": "trend_down",
+    "entry_price": 398.20001220703125
+  },
+  {
+    "time": "2026-04-06T00:00:00",
+    "symbol": "7181.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1595.0,
+    "cash_after": 303940.00549316406,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-04-10T00:00:00",
+    "symbol": "9434.T",
+    "side": "SELL",
+    "qty": 900,
+    "price": 211.1999969482422,
+    "cash_after": 494020.00274658203,
+    "pnl": -5129.997253417969,
+    "reason": "trend_down",
+    "entry_price": 216.89999389648438
+  },
+  {
+    "time": "2026-04-10T00:00:00",
+    "symbol": "9064.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1836.0,
+    "cash_after": 310420.00274658203,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-04-23T00:00:00",
+    "symbol": "7181.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1506.0,
+    "cash_after": 461020.00274658203,
+    "pnl": -8900.0,
+    "reason": "trend_down",
+    "entry_price": 1595.0
+  },
+  {
+    "time": "2026-04-23T00:00:00",
+    "symbol": "8801.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1734.0,
+    "cash_after": 287620.00274658203,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-04-30T00:00:00",
+    "symbol": "2801.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1426.5,
+    "cash_after": 430270.00274658203,
+    "pnl": -13150.0,
+    "reason": "trend_down",
+    "entry_price": 1558.0
+  },
+  {
+    "time": "2026-04-30T00:00:00",
+    "symbol": "8801.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1704.5,
+    "cash_after": 600720.002746582,
+    "pnl": -2950.0,
+    "reason": "trend_down",
+    "entry_price": 1734.0
+  },
+  {
+    "time": "2026-05-07T00:00:00",
+    "symbol": "9064.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1822.5,
+    "cash_after": 782970.002746582,
+    "pnl": -1350.0,
+    "reason": "trend_down",
+    "entry_price": 1836.0
+  },
+  {
+    "time": "2026-05-12T00:00:00",
+    "symbol": "7733.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1540.5,
+    "cash_after": 937020.002746582,
+    "pnl": -2450.0,
+    "reason": "trend_down",
+    "entry_price": 1565.0
+  },
+  {
+    "time": "2026-05-13T00:00:00",
+    "symbol": "7733.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1846.0,
+    "cash_after": 752420.002746582,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-05-14T00:00:00",
+    "symbol": "3407.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1729.0,
+    "cash_after": 579520.002746582,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-05-14T00:00:00",
+    "symbol": "7211.T",
+    "side": "BUY",
+    "qty": 500,
+    "price": 337.70001220703125,
+    "cash_after": 410669.9966430664,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-05-15T00:00:00",
+    "symbol": "4005.T",
+    "side": "BUY",
+    "qty": 200,
+    "price": 623.5999755859375,
+    "cash_after": 285950.0015258789,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-06-11T00:00:00",
+    "symbol": "7211.T",
+    "side": "SELL",
+    "qty": 500,
+    "price": 325.0,
+    "cash_after": 448450.0015258789,
+    "pnl": -6350.006103515625,
+    "reason": "trend_down",
+    "entry_price": 337.70001220703125
+  },
+  {
+    "time": "2026-06-16T00:00:00",
+    "symbol": "4005.T",
+    "side": "SELL",
+    "qty": 200,
+    "price": 576.5,
+    "cash_after": 563750.0015258789,
+    "pnl": -9419.9951171875,
+    "reason": "trend_down",
+    "entry_price": 623.5999755859375
+  },
+  {
+    "time": "2026-06-16T00:00:00",
+    "symbol": "3402.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1177.0,
+    "cash_after": 446050.0015258789,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-06-17T00:00:00",
+    "symbol": "7733.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1612.0,
+    "cash_after": 607250.0015258789,
+    "pnl": -23400.0,
+    "reason": "trend_down",
+    "entry_price": 1846.0
+  },
+  {
+    "time": "2026-06-17T00:00:00",
+    "symbol": "9009.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1078.0,
+    "cash_after": 499450.0015258789,
+    "pnl": null,
+    "reason": "trend_up"
+  },
+  {
+    "time": "2026-06-18T00:00:00",
+    "symbol": "7181.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1550.0,
+    "cash_after": 344450.0015258789,
+    "pnl": null,
+    "reason": "trend_up"
+  }
+]

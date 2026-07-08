@@ -1,0 +1,32 @@
+{
+  "cash": 344450.0015258789,
+  "initial_cash": 1000000.0,
+  "realized_pnl": -102149.9984741211,
+  "positions": {
+    "3407.T": {
+      "qty": 100,
+      "entry_price": 1729.0,
+      "entry_time": "2026-05-14T00:00:00",
+      "highwater": 1729.0
+    },
+    "3402.T": {
+      "qty": 100,
+      "entry_price": 1177.0,
+      "entry_time": "2026-06-16T00:00:00",
+      "highwater": 1177.0
+    },
+    "9009.T": {
+      "qty": 100,
+      "entry_price": 1078.0,
+      "entry_time": "2026-06-17T00:00:00",
+      "highwater": 1078.0
+    },
+    "7181.T": {
+      "qty": 100,
+      "entry_price": 1550.0,
+      "entry_time": "2026-06-18T00:00:00",
+      "highwater": 1550.0
+    }
+  },
+  "last_updated": "2026-07-08T00:00:00"
+}

@@ -1,0 +1,14 @@
+{
+  "period_start": "2026-01-08T00:00:00",
+  "period_end": "2026-07-08T00:00:00",
+  "symbols_scanned": 159,
+  "ma_short_days": 10,
+  "ma_long_days": 30,
+  "initial_cash": 1000000.0,
+  "final_equity": 937350.0,
+  "return_pct": -6.26,
+  "num_round_trips": 12,
+  "win_rate_pct": 0.0,
+  "total_realized_pnl": -102150.0,
+  "still_open_positions": 4
+}
