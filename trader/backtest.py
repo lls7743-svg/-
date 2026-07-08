@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict
+from pathlib import Path
 from typing import Callable
 
 from . import config
@@ -27,12 +28,12 @@ from .portfolio import Portfolio, DATA_DIR
 from .strategy import decide_and_execute
 
 BACKTEST_DIR = DATA_DIR / "backtest"
-PRICES_DIR = BACKTEST_DIR / "prices"
 
 
 def run_backtest(
     symbols: list[str] | None = None,
     fetch: Callable[[list[str]], dict] = fetch_history_batch,
+    output_dir: Path | None = BACKTEST_DIR,
 ) -> dict:
     symbols = symbols if symbols is not None else config.WATCHLIST
     all_data = fetch(symbols)
@@ -77,12 +78,14 @@ def run_backtest(
         "still_open_positions": len(portfolio.positions),
     }
 
-    _save_dashboard_output(portfolio, trade_log, equity_curve, all_data, summary)
+    if output_dir is not None:
+        _save_dashboard_output(output_dir, portfolio, trade_log, equity_curve, all_data, summary)
     return summary
 
 
-def _save_dashboard_output(portfolio, trade_log, equity_curve, all_data, summary) -> None:
-    BACKTEST_DIR.mkdir(parents=True, exist_ok=True)
+def _save_dashboard_output(output_dir: Path, portfolio, trade_log, equity_curve, all_data, summary) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    prices_dir = output_dir / "prices"
 
     payload = {
         "cash": portfolio.cash,
@@ -91,10 +94,10 @@ def _save_dashboard_output(portfolio, trade_log, equity_curve, all_data, summary
         "positions": {sym: asdict(pos) for sym, pos in portfolio.positions.items()},
         "last_updated": equity_curve[-1]["t"] if equity_curve else None,
     }
-    (BACKTEST_DIR / "portfolio.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2))
-    (BACKTEST_DIR / "trades.json").write_text(json.dumps(trade_log, ensure_ascii=False, indent=2))
-    (BACKTEST_DIR / "equity.json").write_text(json.dumps(equity_curve, ensure_ascii=False, indent=2))
-    (BACKTEST_DIR / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2))
+    (output_dir / "portfolio.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2))
+    (output_dir / "trades.json").write_text(json.dumps(trade_log, ensure_ascii=False, indent=2))
+    (output_dir / "equity.json").write_text(json.dumps(equity_curve, ensure_ascii=False, indent=2))
+    (output_dir / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2))
 
     # Only chart the symbols that actually traded (or ended up held), same
     # rationale as the live run: no need for chart JSON on every scanned name.
@@ -102,8 +105,8 @@ def _save_dashboard_output(portfolio, trade_log, equity_curve, all_data, summary
     for symbol in relevant_symbols:
         df = all_data.get(symbol)
         if df is not None and not df.empty:
-            save_price_history(PRICES_DIR, symbol, df, keep_days=None)
-    update_prices_index(PRICES_DIR, list(relevant_symbols))
+            save_price_history(prices_dir, symbol, df, keep_days=None)
+    update_prices_index(prices_dir, list(relevant_symbols))
 
 
 def main() -> None:
