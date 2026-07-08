@@ -1,16 +1,58 @@
 """Simulator configuration: watchlist, capital, and strategy parameters."""
 
-# Tokyo Stock Exchange tickers (Yahoo Finance ".T" suffix), large-cap / liquid names
-WATCHLIST = [
-    "7203.T",  # Toyota Motor
-    "6758.T",  # Sony Group
-    "9984.T",  # SoftBank Group
-    "8306.T",  # Mitsubishi UFJ Financial Group
-    "6501.T",  # Hitachi
-    "9432.T",  # NTT
-    "6098.T",  # Recruit Holdings
-    "4063.T",  # Shin-Etsu Chemical
-]
+# Broad, liquid Japan large-cap universe (Yahoo Finance ".T" suffix). This is a
+# hand-compiled approximation of the Nikkei 225-style blue-chip basket, not the
+# official, periodically-revised index membership list -- good enough for a
+# simulator's stock-picking pool, but don't treat it as authoritative.
+# Scanned in full every cycle so the strategy can pick its favorites rather
+# than being limited to a handful of fixed names.
+WATCHLIST = list(dict.fromkeys([
+    # Autos & transport equipment
+    "7203.T", "7267.T", "7201.T", "7269.T", "7270.T", "7211.T", "7261.T",
+    "7202.T", "7205.T", "7259.T", "6902.T", "7276.T",
+    # Machinery
+    "6301.T", "6113.T", "6141.T", "6273.T", "6367.T", "6103.T", "7011.T",
+    "7013.T", "7012.T", "6448.T", "6479.T",
+    # Electronics & precision
+    "6758.T", "6501.T", "6502.T", "6503.T", "6752.T", "6702.T", "6701.T",
+    "6971.T", "6976.T", "6857.T", "8035.T", "6723.T", "6963.T", "6762.T",
+    "6841.T", "7735.T", "6920.T", "6594.T", "6645.T", "6869.T", "6952.T",
+    "4901.T", "7751.T", "7733.T",
+    # Telecom & internet
+    "9432.T", "9433.T", "9434.T", "9984.T", "4689.T", "9613.T", "4755.T",
+    # Banks, insurance & securities
+    "8306.T", "8316.T", "8411.T", "8308.T", "8354.T", "8331.T", "8309.T",
+    "8604.T", "8628.T", "8697.T", "8766.T", "8750.T", "8725.T", "8630.T",
+    "8591.T", "8593.T",
+    # Trading houses
+    "8058.T", "8031.T", "8001.T", "8002.T", "2768.T",
+    # Retail
+    "9983.T", "3382.T", "8267.T", "3092.T", "9843.T", "3086.T", "8252.T",
+    "3099.T", "2651.T",
+    # Pharma & healthcare
+    "4502.T", "4503.T", "4568.T", "4519.T", "4523.T", "4507.T", "4151.T",
+    "4543.T",
+    # Chemicals & materials
+    "4063.T", "4188.T", "4005.T", "4021.T", "3407.T", "5401.T", "5406.T",
+    "5411.T", "5713.T", "5801.T", "5802.T", "5803.T", "4183.T", "4061.T",
+    "4208.T", "3402.T", "3861.T", "3405.T",
+    # Food & beverage
+    "2502.T", "2503.T", "2801.T", "2802.T", "2269.T", "2914.T", "2871.T",
+    "2201.T", "2811.T",
+    # Construction & real estate
+    "1801.T", "1802.T", "1803.T", "1808.T", "8801.T", "8802.T", "8830.T",
+    "1928.T", "1925.T",
+    # Transport & infrastructure
+    "9020.T", "9021.T", "9022.T", "9202.T", "9201.T", "9531.T", "9501.T",
+    "9502.T", "9503.T", "9142.T", "9005.T", "9007.T", "9008.T", "9009.T",
+    "9064.T", "9147.T",
+    # Entertainment & consumer
+    "4661.T", "7974.T", "9697.T", "7832.T", "9735.T", "4324.T", "9602.T",
+    "4676.T",
+    # Consumer goods & other large caps
+    "8113.T", "4452.T", "7912.T", "7911.T", "5020.T", "5019.T", "6178.T",
+    "7182.T", "7181.T", "6146.T", "6098.T",
+]))
 
 INITIAL_CASH = 1_000_000.0  # JPY
 

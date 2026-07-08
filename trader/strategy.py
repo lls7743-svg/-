@@ -61,16 +61,17 @@ def decide_and_execute(portfolio: Portfolio, market_data: dict, now, now_iso: st
         if reason:
             trades.append(portfolio.sell(symbol, price, now_iso, reason))
 
-    # --- Look for new entries ---
+    # --- Look for new entries: scan the whole watchlist, rank all golden-cross
+    # candidates by breakout strength, and buy the strongest ones first rather
+    # than just the first match in list order. ---
     if not force_close and not past_entry_cutoff:
         last_prices = {
             sym: float(market_data[sym]["close"].iloc[-1])
             for sym in market_data
             if not market_data[sym].empty
         }
+        candidates = []
         for symbol in config.WATCHLIST:
-            if len(portfolio.positions) >= config.MAX_POSITIONS:
-                break
             if symbol in portfolio.positions:
                 continue
             df = market_data.get(symbol)
@@ -83,6 +84,15 @@ def decide_and_execute(portfolio: Portfolio, market_data: dict, now, now_iso: st
                 continue
 
             price = float(ind["close"].iloc[-1])
+            ma_long = float(ind["ma_long"].iloc[-1])
+            strength = (price - ma_long) / ma_long  # how far above its trend the breakout is
+            candidates.append((strength, symbol, price))
+
+        candidates.sort(key=lambda c: c[0], reverse=True)
+
+        for _strength, symbol, price in candidates:
+            if len(portfolio.positions) >= config.MAX_POSITIONS:
+                break
             equity = portfolio.equity(last_prices)
             budget = equity * config.POSITION_SIZE_FRACTION
             qty = int(budget // price // config.SHARE_LOT_SIZE) * config.SHARE_LOT_SIZE

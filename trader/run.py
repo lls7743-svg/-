@@ -6,7 +6,7 @@ import datetime as dt
 import json
 
 from . import config
-from .data import fetch_history, is_market_open, now_jst
+from .data import fetch_history_batch, is_market_open, now_jst
 from .portfolio import Portfolio, append_trades, append_equity_point, DATA_DIR
 from .strategy import decide_and_execute
 
@@ -48,24 +48,26 @@ def main() -> None:
         return
 
     symbols = sorted(set(config.WATCHLIST) | set(portfolio.positions.keys()))
-    market_data = {}
-    for symbol in symbols:
-        try:
-            df = fetch_history(symbol)
-        except Exception as exc:  # noqa: BLE001 - keep the cycle alive on a bad ticker
-            print(f"[{now_iso}] Failed to fetch {symbol}: {exc}")
-            continue
-        if df.empty:
-            continue
-        market_data[symbol] = df
-        _save_price_history(symbol, df)
-
-    _update_prices_index(list(market_data.keys()))
+    try:
+        market_data = fetch_history_batch(symbols)
+    except Exception as exc:  # noqa: BLE001 - keep the cycle alive on a bad batch fetch
+        print(f"[{now_iso}] Failed to fetch market data: {exc}")
+        market_data = {}
 
     trades = decide_and_execute(portfolio, market_data, now, now_iso)
     portfolio.last_updated = now_iso
     portfolio.save()
     append_trades(trades)
+
+    # Only persist chart data for symbols the dashboard actually needs (open
+    # positions + anything traded this cycle) -- scanning ~150 candidates
+    # every cycle shouldn't mean writing ~150 JSON files every cycle.
+    relevant_symbols = set(portfolio.positions.keys()) | {t["symbol"] for t in trades}
+    for symbol in relevant_symbols:
+        df = market_data.get(symbol)
+        if df is not None and not df.empty:
+            _save_price_history(symbol, df)
+    _update_prices_index(list(relevant_symbols))
 
     last_prices = {sym: float(df["close"].iloc[-1]) for sym, df in market_data.items()}
     append_equity_point(now_iso, portfolio.equity(last_prices))

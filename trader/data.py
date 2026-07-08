@@ -52,6 +52,37 @@ def fetch_history(symbol: str) -> pd.DataFrame:
         interval=config.INTERVAL,
         auto_adjust=False,
     )
+    return _clean(df)
+
+
+def fetch_history_batch(symbols: list[str]) -> dict[str, pd.DataFrame]:
+    """Fetch recent intraday OHLCV for many symbols in one batched, threaded call."""
+    import yfinance as yf
+
+    if not symbols:
+        return {}
+    raw = yf.download(
+        tickers=symbols,
+        period=config.LOOKBACK_PERIOD,
+        interval=config.INTERVAL,
+        group_by="ticker",
+        auto_adjust=False,
+        threads=True,
+        progress=False,
+    )
+    result = {}
+    for symbol in symbols:
+        try:
+            df = raw if len(symbols) == 1 else raw[symbol]
+        except KeyError:
+            continue
+        df = _clean(df.dropna(how="all"))
+        if not df.empty:
+            result[symbol] = df
+    return result
+
+
+def _clean(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
     df = df.tz_convert(JST) if df.index.tz is not None else df.tz_localize(JST)
