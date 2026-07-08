@@ -23,16 +23,27 @@ def _synthetic_fetch(symbols):
 
 
 def test_run_returns_summary():
-    summary = run(symbols=["AAA.T", "BBB.T"], fetch=_synthetic_fetch)
+    # output_dir=None: don't touch the real repo's data/ directory from a test.
+    summary = run(symbols=["AAA.T", "BBB.T"], fetch=_synthetic_fetch, output_dir=None)
     assert summary["symbols_scanned"] == 2
     assert summary["initial_cash"] > 0
     assert summary["entry_window_days"] == 20
     assert summary["period_start"] is not None
 
 
+def test_run_writes_dashboard_output(tmp_path):
+    out_dir = tmp_path / "breakout_backtest"
+    run(symbols=["AAA.T", "BBB.T"], fetch=_synthetic_fetch, output_dir=out_dir)
+    assert (out_dir / "portfolio.json").exists()
+    assert (out_dir / "trades.json").exists()
+    assert (out_dir / "equity.json").exists()
+    assert (out_dir / "summary.json").exists()
+    assert (out_dir / "prices" / "index.json").exists()
+
+
 def test_run_raises_on_no_data():
     try:
-        run(symbols=["AAA.T"], fetch=lambda symbols: {})
+        run(symbols=["AAA.T"], fetch=lambda symbols: {}, output_dir=None)
         assert False, "expected RuntimeError"
     except RuntimeError:
         pass

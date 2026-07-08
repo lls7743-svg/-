@@ -8,14 +8,19 @@ const REASON_LABELS = {
   bearish_reversal_pattern: "反転パターン（陰線包み足/流れ星）",
   dead_cross: "デッドクロス",
   day_trade_close: "大引け前の手仕舞い",
+  new_high_breakout: "直近高値更新（買い）",
+  new_low_exit: "直近安値割れ（手仕舞い）",
 };
 
-// ?data=backtest points the same dashboard at data/backtest/ instead of data/,
-// so backtested trades can be reviewed on the same charts as live trades.
-const DATA_BASE = new URLSearchParams(location.search).get("data") === "backtest"
-  ? "data/backtest"
-  : "data";
-const IS_BACKTEST = DATA_BASE !== "data";
+// ?data=<name> points the same dashboard at data/<name>/ instead of data/, so
+// any backtest's trades can be reviewed on the same charts as live trades.
+const ALT_DATA_LABELS = {
+  backtest: "バックテスト結果（ルールベース戦略）",
+  breakout_backtest: "高値更新ブレイクアウト検証（日足・6ヶ月）",
+};
+const DATA_PARAM = new URLSearchParams(location.search).get("data");
+const DATA_BASE = DATA_PARAM ? `data/${DATA_PARAM}` : "data";
+const IS_BACKTEST = DATA_PARAM !== null;
 
 const fmtYen = (n) => "¥" + Math.round(n).toLocaleString("ja-JP");
 const fmtPct = (n) => (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
@@ -240,9 +245,10 @@ function renderTradeLog(trades) {
 
 async function main() {
   if (IS_BACKTEST) {
-    document.querySelector("h1").textContent = "デイトレ・シミュレーター（バックテスト結果）";
+    const label = ALT_DATA_LABELS[DATA_PARAM] ?? `参考結果（${DATA_PARAM}）`;
+    document.querySelector("h1").textContent = `デイトレ・シミュレーター（${label}）`;
     document.querySelector(".subtitle").innerHTML =
-      '過去データに現在の戦略ロジックを当てはめた結果（参考値・将来の成績を保証するものではありません） / ' +
+      '過去データを使った検証結果です（参考値・将来の成績を保証するものではありません） / ' +
       '最終データ時点: <span id="last-updated">-</span> / <a href="index.html">ライブ運用の結果に戻る</a>';
   }
 

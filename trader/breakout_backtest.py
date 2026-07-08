@@ -8,18 +8,22 @@ not share code with it so the two don't get tangled.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Callable
 
 import pandas as pd
 
 from . import config
-from .portfolio import Portfolio
+from .chart_data import save_backtest_snapshot
+from .portfolio import Portfolio, DATA_DIR
 
 ENTRY_WINDOW_DAYS = 20   # buy when close breaks the highest high of the prior N days
 EXIT_WINDOW_DAYS = 10    # sell when close breaks the lowest low of the prior N days
 STOP_LOSS_PCT = 0.05
 PERIOD = "6mo"
 INTERVAL = "1d"
+
+OUTPUT_DIR = DATA_DIR / "breakout_backtest"
 
 
 def fetch_daily(symbols: list[str]) -> dict[str, pd.DataFrame]:
@@ -41,7 +45,11 @@ def fetch_daily(symbols: list[str]) -> dict[str, pd.DataFrame]:
     return out
 
 
-def run(symbols: list[str] | None = None, fetch: Callable[[list[str]], dict] = fetch_daily) -> dict:
+def run(
+    symbols: list[str] | None = None,
+    fetch: Callable[[list[str]], dict] = fetch_daily,
+    output_dir: Path | None = OUTPUT_DIR,
+) -> dict:
     symbols = symbols if symbols is not None else config.WATCHLIST
     all_data = fetch(symbols)
     if not all_data:
@@ -50,6 +58,7 @@ def run(symbols: list[str] | None = None, fetch: Callable[[list[str]], dict] = f
     timestamps = sorted(set().union(*(df.index for df in all_data.values())))
     portfolio = Portfolio()
     trade_log: list[dict] = []
+    equity_curve: list[dict] = []
 
     for t in timestamps:
         # --- exits ---
@@ -71,6 +80,10 @@ def run(symbols: list[str] | None = None, fetch: Callable[[list[str]], dict] = f
             if reason:
                 trade_log.append(portfolio.sell(symbol, price, t.isoformat(), reason))
 
+        last_prices = {
+            s: float(d.loc[:t]["close"].iloc[-1]) for s, d in all_data.items() if t in d.index
+        }
+
         # --- entries ---
         if len(portfolio.positions) < config.MAX_POSITIONS:
             candidates = []
@@ -90,9 +103,6 @@ def run(symbols: list[str] | None = None, fetch: Callable[[list[str]], dict] = f
                     candidates.append((strength, symbol, price))
             candidates.sort(key=lambda c: c[0], reverse=True)
 
-            last_prices = {
-                s: float(d.loc[:t]["close"].iloc[-1]) for s, d in all_data.items() if t in d.index
-            }
             for _strength, symbol, price in candidates:
                 if len(portfolio.positions) >= config.MAX_POSITIONS:
                     break
@@ -103,12 +113,14 @@ def run(symbols: list[str] | None = None, fetch: Callable[[list[str]], dict] = f
                     continue
                 trade_log.append(portfolio.buy(symbol, qty, price, t.isoformat(), reason="new_high_breakout"))
 
+        equity_curve.append({"t": t.isoformat(), "equity": portfolio.equity(last_prices)})
+
     closed = [tr for tr in trade_log if tr["side"] == "SELL"]
     wins = [tr for tr in closed if tr["pnl"] > 0]
     last_prices = {s: float(d["close"].iloc[-1]) for s, d in all_data.items()}
     final_equity = portfolio.equity(last_prices)
 
-    return {
+    summary = {
         "period_start": timestamps[0].isoformat() if timestamps else None,
         "period_end": timestamps[-1].isoformat() if timestamps else None,
         "symbols_scanned": len(symbols),
@@ -123,6 +135,10 @@ def run(symbols: list[str] | None = None, fetch: Callable[[list[str]], dict] = f
         "total_realized_pnl": round(sum(tr["pnl"] for tr in closed), 2),
         "still_open_positions": len(portfolio.positions),
     }
+
+    if output_dir is not None:
+        save_backtest_snapshot(output_dir, portfolio, trade_log, equity_curve, all_data, summary)
+    return summary
 
 
 def main() -> None:
