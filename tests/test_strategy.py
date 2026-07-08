@@ -15,10 +15,16 @@ from trader.strategy import decide_and_execute
 JST = ZoneInfo("Asia/Tokyo")
 
 
-def _bars(closes, start=dt.datetime(2024, 1, 10, 9, 0, tzinfo=JST)):
+def _bars(closes, start=dt.datetime(2024, 1, 10, 9, 0, tzinfo=JST), volumes=None):
     idx = [start + dt.timedelta(minutes=30 * i) for i in range(len(closes))]
     df = pd.DataFrame(
-        {"open": closes, "high": closes, "low": closes, "close": closes, "volume": 1000},
+        {
+            "open": closes,
+            "high": closes,
+            "low": closes,
+            "close": closes,
+            "volume": volumes if volumes is not None else [1000] * len(closes),
+        },
         index=pd.DatetimeIndex(idx),
     )
     return df
@@ -26,10 +32,12 @@ def _bars(closes, start=dt.datetime(2024, 1, 10, 9, 0, tzinfo=JST)):
 
 def test_golden_cross_triggers_buy():
     # Mild oscillation (keeps RSI out of overbought territory) then a rise on
-    # the final bar so the short MA crosses above the long MA right now.
+    # the final bar so the short MA crosses above the long MA right now, the
+    # close breaks the prior range's high, and volume confirms the move.
     base = [100.0 + (-0.3 if i % 2 == 0 else 0.3) for i in range(config.MA_LONG)]
     closes = base + [101.5]
-    df = _bars(closes)
+    volumes = [1000] * config.MA_LONG + [5000]  # final bar's volume spikes
+    df = _bars(closes, volumes=volumes)
     portfolio = Portfolio(cash=1_000_000.0, initial_cash=1_000_000.0)
     now = dt.datetime(2024, 1, 10, 10, 0, tzinfo=JST)  # within morning session
     trades = decide_and_execute(portfolio, {"7203.T": df}, now, now.isoformat())

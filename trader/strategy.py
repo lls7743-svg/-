@@ -12,7 +12,18 @@ import pandas as pd
 
 from . import config
 from .data import is_force_close_time, is_past_entry_cutoff, is_market_open
-from .indicators import sma, rsi, golden_cross, dead_cross
+from .indicators import (
+    sma,
+    rsi,
+    golden_cross,
+    dead_cross,
+    is_bullish_engulfing,
+    is_bearish_engulfing,
+    is_hammer,
+    is_shooting_star,
+    breaks_recent_high,
+    volume_confirms,
+)
 from .portfolio import Portfolio
 
 
@@ -55,6 +66,8 @@ def decide_and_execute(portfolio: Portfolio, market_data: dict, now, now_iso: st
             price <= pos.highwater * (1 - config.TRAILING_STOP_PCT)
         ):
             reason = "trailing_take_profit"
+        elif is_bearish_engulfing(df) or is_shooting_star(df):
+            reason = "bearish_reversal_pattern"
         elif dead_cross(ind["ma_short"], ind["ma_long"]):
             reason = "dead_cross"
 
@@ -83,9 +96,23 @@ def decide_and_execute(portfolio: Portfolio, market_data: dict, now, now_iso: st
             if ind["rsi"].iloc[-1] >= config.RSI_OVERBOUGHT:
                 continue
 
+            pattern_confirmed = (
+                is_bullish_engulfing(df)
+                or is_hammer(df)
+                or breaks_recent_high(df, config.BREAKOUT_WINDOW)
+            )
+            if config.REQUIRE_PATTERN_CONFIRMATION and not pattern_confirmed:
+                continue
+            if config.REQUIRE_VOLUME_CONFIRMATION and not volume_confirms(
+                df, config.BREAKOUT_WINDOW, config.VOLUME_CONFIRM_MULTIPLIER
+            ):
+                continue
+
             price = float(ind["close"].iloc[-1])
             ma_long = float(ind["ma_long"].iloc[-1])
             strength = (price - ma_long) / ma_long  # how far above its trend the breakout is
+            if pattern_confirmed:
+                strength += config.PATTERN_SCORE_BONUS
             candidates.append((strength, symbol, price))
 
         candidates.sort(key=lambda c: c[0], reverse=True)

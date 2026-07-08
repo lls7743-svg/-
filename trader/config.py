@@ -67,6 +67,15 @@ RSI_PERIOD = 14
 RSI_OVERBOUGHT = 70.0
 RSI_OVERSOLD = 30.0
 
+# Chart-pattern confirmation, layered on top of the MA-cross/RSI base signal so
+# entries need a candlestick reversal cue or a breakout of the recent range --
+# not just a crossover -- plus volume backing it up.
+REQUIRE_PATTERN_CONFIRMATION = True
+REQUIRE_VOLUME_CONFIRMATION = True
+BREAKOUT_WINDOW = 20              # bars used for recent-high breakout and average volume
+VOLUME_CONFIRM_MULTIPLIER = 1.5   # entry bar's volume vs. the preceding window's average
+PATTERN_SCORE_BONUS = 0.02        # ranking bonus when a candlestick/breakout pattern also confirms
+
 # Risk / exit rules ("timing" is decided dynamically, not a fixed target)
 STOP_LOSS_PCT = 0.03          # hard stop-loss: -3% from entry
 TAKE_PROFIT_ARM_PCT = 0.02    # once price is +2% from entry, arm the trailing stop
