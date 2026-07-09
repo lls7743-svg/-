@@ -32,6 +32,9 @@ let adviceInFlight = false;
 let restartTimer = null;
 let rapidRestartCount = 0;
 let lastRestartAt = 0;
+let currentInterim = '';
+let interimUnchangedTicks = 0;
+let staleCheckTimer = null;
 
 consentCheck.addEventListener('change', () => {
   startBtn.disabled = !consentCheck.checked;
@@ -71,6 +74,8 @@ function ensureRecognition() {
         interim += text;
       }
     }
+    currentInterim = interim;
+    interimUnchangedTicks = 0;
     renderTranscript(interim);
     maybeRequestAdvice();
   };
@@ -90,6 +95,9 @@ function ensureRecognition() {
 
   rec.onend = () => {
     if (!listening) return;
+
+    // 中断時に確定していなかった発言も、失わずに確定分へ繰り入れる
+    commitInterim();
 
     const now = Date.now();
     // 短時間に何度も再起動を繰り返す場合は、マイクが実際には使えない状態とみなして止める
@@ -120,6 +128,27 @@ function ensureRecognition() {
   };
 
   return rec;
+}
+
+function commitInterim() {
+  if (!currentInterim.trim()) return;
+  fullFinalTranscript += currentInterim;
+  sinceLastAdviceBuffer += currentInterim;
+  currentInterim = '';
+  interimUnchangedTicks = 0;
+  renderTranscript('');
+}
+
+function checkStaleInterim() {
+  if (!listening) return;
+  if (currentInterim.trim()) {
+    // 数秒間テキストが更新されていない = 発言の切れ目とみなして確定させる
+    interimUnchangedTicks += 1;
+    if (interimUnchangedTicks >= 2) {
+      commitInterim();
+    }
+  }
+  maybeRequestAdvice();
 }
 
 function renderTranscript(interim) {
@@ -199,6 +228,10 @@ function startListening() {
     micBtn.classList.add('active');
     micLabel.textContent = 'マイク停止';
     setStatus('聞いています…');
+    currentInterim = '';
+    interimUnchangedTicks = 0;
+    clearInterval(staleCheckTimer);
+    staleCheckTimer = setInterval(checkStaleInterim, 2000);
   } catch (err) {
     console.error(err);
     setStatus('マイクの開始に失敗しました');
@@ -208,6 +241,7 @@ function startListening() {
 function stopListening() {
   listening = false;
   clearTimeout(restartTimer);
+  clearInterval(staleCheckTimer);
   rapidRestartCount = 0;
   micBtn.classList.remove('active');
   micLabel.textContent = 'マイク開始';
