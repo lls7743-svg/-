@@ -1,0 +1,38 @@
+name: Daily pre-market drop screener
+
+on:
+  schedule:
+    # 00:00 UTC = 09:00 JST, Mon-Fri (TSE open). Give the market a moment to
+    # start trading before the first fetch inside the 09:00-09:15 window.
+    - cron: "0 0 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      threshold:
+        description: "Drop threshold in percent"
+        required: false
+        default: "5"
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run screener
+        run: |
+          python src/screener.py --threshold "${{ github.event.inputs.threshold || '5' }}"
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: screener-results-${{ github.run_id }}
+          path: output/
+          retention-days: 30
