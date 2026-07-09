@@ -44,6 +44,7 @@ body {
 header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
 h1 { font-size: 20px; margin: 0; }
 .subtitle { color: var(--text-muted); font-size: 13px; }
+.backtest-nav { margin-top: 2px; }
 
 .stat-row {
   display: grid;
