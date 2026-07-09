@@ -1,0 +1,16 @@
+{
+  "name": "conversation-coach",
+  "version": "1.0.0",
+  "description": "マイクで聞いた会話をリアルタイムに分析し、コミュニケーションが円滑になるようアドバイスするWebアプリ",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会話コーチ | Conversation Coach</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app__header">
+      <h1>会話コーチ</h1>
+      <p class="app__subtitle">マイクの会話をその場で分析し、円滑で好印象なコミュニケーションをそっとサポートします</p>
+    </header>
+
+    <section class="consent" id="consentScreen">
+      <div class="consent__card">
+        <h2>はじめる前に</h2>
+        <ul class="consent__list">
+          <li>このアプリは<strong>あなたの端末内のマイク</strong>から会話を音声認識し、直近部分だけをアドバイス生成のために送信します。</li>
+          <li>録音・分析には<strong>会話相手の同意</strong>を得てから使用してください。無断での盗聴・記録目的の利用はできません。</li>
+          <li>アドバイスは目安です。最終的な言動の判断は必ずご自身で行ってください。</li>
+        </ul>
+        <label class="consent__checkbox">
+          <input type="checkbox" id="consentCheck" />
+          相手の同意を得た上で、上記内容を理解しました
+        </label>
+        <button id="startBtn" class="btn btn--primary" disabled>会話コーチを開始する</button>
+      </div>
+    </section>
+
+    <main class="main" id="mainScreen" hidden>
+      <div class="controls">
+        <div class="relationship">
+          <label>相手との関係</label>
+          <select id="relationshipSelect">
+            <option value="friend">友人</option>
+            <option value="romantic_interest">気になっている女性</option>
+            <option value="general">その他</option>
+          </select>
+        </div>
+        <button id="micBtn" class="btn btn--mic">
+          <span class="mic-dot"></span>
+          <span id="micLabel">マイク開始</span>
+        </button>
+        <span class="status" id="statusText">待機中</span>
+      </div>
+
+      <div class="panels">
+        <div class="panel panel--advice">
+          <h2>今すぐのアドバイス</h2>
+          <div class="mood" id="moodIndicator" data-mood="neutral">雰囲気: -</div>
+          <div class="advice-feed" id="adviceFeed">
+            <p class="advice-placeholder">会話が始まると、ここにその場のヒントが表示されます。</p>
+          </div>
+        </div>
+
+        <div class="panel panel--transcript">
+          <h2>文字起こし</h2>
+          <div class="transcript" id="transcriptBox"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
