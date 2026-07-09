@@ -30,6 +30,11 @@
     </section>
 
     <main class="main" id="mainScreen" hidden>
+      <div class="mode-tabs">
+        <button class="tab-btn active" id="modeMicBtn" data-mode="mic">🎙 音声でリアルタイム</button>
+        <button class="tab-btn" id="modeTextBtn" data-mode="text">💬 メッセージを貼り付け</button>
+      </div>
+
       <div class="controls">
         <div class="relationship">
           <label>相手との関係</label>
@@ -46,7 +51,7 @@
         <span class="status" id="statusText">待機中</span>
       </div>
 
-      <div class="panels">
+      <div class="panels" id="micView">
         <div class="panel panel--advice">
           <h2>今すぐのアドバイス</h2>
           <div class="mood" id="moodIndicator" data-mood="neutral">雰囲気: -</div>
@@ -58,6 +63,26 @@
         <div class="panel panel--transcript">
           <h2>文字起こし</h2>
           <div class="transcript" id="transcriptBox"></div>
+        </div>
+      </div>
+
+      <div class="panels" id="textView" hidden>
+        <div class="panel panel--transcript">
+          <h2>会話を貼り付け</h2>
+          <textarea
+            id="conversationText"
+            class="conversation-input"
+            placeholder="LINEなどのやり取りをコピーして貼り付けてください&#10;例：&#10;相手: 週末どこか行った？&#10;自分: 家でゆっくりしてた"
+          ></textarea>
+          <button id="analyzeTextBtn" class="btn btn--primary">分析する</button>
+        </div>
+
+        <div class="panel panel--advice">
+          <h2>分析結果</h2>
+          <div class="mood" id="textMoodIndicator" data-mood="neutral">雰囲気: -</div>
+          <div class="advice-feed" id="textAdviceResult">
+            <p class="advice-placeholder">会話を貼り付けて「分析する」を押すと、アドバイスと返信案が表示されます。</p>
+          </div>
         </div>
       </div>
     </main>

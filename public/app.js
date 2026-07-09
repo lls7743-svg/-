@@ -10,6 +10,15 @@ const transcriptBox = document.getElementById('transcriptBox');
 const adviceFeed = document.getElementById('adviceFeed');
 const moodIndicator = document.getElementById('moodIndicator');
 
+const modeMicBtn = document.getElementById('modeMicBtn');
+const modeTextBtn = document.getElementById('modeTextBtn');
+const micView = document.getElementById('micView');
+const textView = document.getElementById('textView');
+const conversationText = document.getElementById('conversationText');
+const analyzeTextBtn = document.getElementById('analyzeTextBtn');
+const textAdviceResult = document.getElementById('textAdviceResult');
+const textMoodIndicator = document.getElementById('textMoodIndicator');
+
 const MIN_ADVICE_INTERVAL_MS = 7000; // 助言をリクエストする最短間隔
 const MIN_NEW_CHARS = 12; // これ未満の新規発話ではリクエストしない
 const CONTEXT_WINDOW_CHARS = 800; // Claudeへ渡す直近会話の文字数
@@ -213,5 +222,78 @@ micBtn.addEventListener('click', () => {
     stopListening();
   } else {
     startListening();
+  }
+});
+
+function setMode(mode) {
+  const isMic = mode === 'mic';
+  modeMicBtn.classList.toggle('active', isMic);
+  modeTextBtn.classList.toggle('active', !isMic);
+  micView.hidden = !isMic;
+  textView.hidden = isMic;
+  micBtn.hidden = !isMic;
+  statusText.hidden = !isMic;
+
+  if (!isMic && listening) {
+    stopListening();
+  }
+}
+
+modeMicBtn.addEventListener('click', () => setMode('mic'));
+modeTextBtn.addEventListener('click', () => setMode('text'));
+
+function addResultCard(container, { label, text, cssClass }) {
+  const card = document.createElement('div');
+  card.className = cssClass;
+  if (label) {
+    const labelEl = document.createElement('span');
+    labelEl.className = 'reply-label';
+    labelEl.textContent = label;
+    card.appendChild(labelEl);
+    card.appendChild(document.createTextNode(text));
+  } else {
+    card.textContent = text;
+  }
+  container.prepend(card);
+}
+
+analyzeTextBtn.addEventListener('click', async () => {
+  const conversation = conversationText.value.trim();
+  if (!conversation) return;
+
+  analyzeTextBtn.disabled = true;
+  analyzeTextBtn.textContent = '分析中…';
+
+  try {
+    const res = await fetch('/api/analyze-text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        conversation,
+        relationship: relationshipSelect.value,
+      }),
+    });
+    if (!res.ok) throw new Error(`status ${res.status}`);
+    const data = await res.json();
+
+    const placeholder = textAdviceResult.querySelector('.advice-placeholder');
+    if (placeholder) placeholder.remove();
+
+    if (data.mood) {
+      textMoodIndicator.dataset.mood = data.mood;
+      textMoodIndicator.textContent = `雰囲気: ${moodLabel(data.mood)}`;
+    }
+    if (data.suggestedReply) {
+      addResultCard(textAdviceResult, { label: '返信案', text: data.suggestedReply, cssClass: 'reply-card' });
+    }
+    if (data.advice) {
+      addResultCard(textAdviceResult, { label: null, text: data.advice, cssClass: 'advice-card' });
+    }
+  } catch (err) {
+    console.error('text analysis failed', err);
+    addResultCard(textAdviceResult, { label: null, text: '分析に失敗しました。もう一度お試しください。', cssClass: 'advice-card' });
+  } finally {
+    analyzeTextBtn.disabled = false;
+    analyzeTextBtn.textContent = '分析する';
   }
 });
