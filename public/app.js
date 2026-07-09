@@ -20,6 +20,9 @@ let fullFinalTranscript = '';
 let sinceLastAdviceBuffer = '';
 let lastAdviceAt = 0;
 let adviceInFlight = false;
+let restartTimer = null;
+let rapidRestartCount = 0;
+let lastRestartAt = 0;
 
 consentCheck.addEventListener('change', () => {
   startBtn.disabled = !consentCheck.checked;
@@ -68,20 +71,43 @@ function ensureRecognition() {
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
       setStatus('マイクの使用が許可されていません');
       stopListening();
+    } else if (event.error === 'aborted' || event.error === 'no-speech' || event.error === 'network') {
+      // モバイルのChromeでは無音・回線状況などでよく起こる。onendで自動再接続するため致命的ではない
+      setStatus('聞いています…（再接続中）');
     } else {
       setStatus(`音声認識エラー: ${event.error}`);
     }
   };
 
   rec.onend = () => {
-    if (listening) {
-      // Web Speech APIは無音などで自動停止することがあるため再開する
+    if (!listening) return;
+
+    const now = Date.now();
+    // 短時間に何度も再起動を繰り返す場合は、マイクが実際には使えない状態とみなして止める
+    if (now - lastRestartAt < 2000) {
+      rapidRestartCount += 1;
+    } else {
+      rapidRestartCount = 0;
+    }
+    lastRestartAt = now;
+
+    if (rapidRestartCount > 6) {
+      setStatus('音声認識が不安定です。マイクの許可設定を確認し、開始し直してください');
+      stopListening();
+      return;
+    }
+
+    // 直後にstart()すると失敗しやすいため少し待ってから再開する
+    clearTimeout(restartTimer);
+    restartTimer = setTimeout(() => {
+      if (!listening) return;
       try {
         rec.start();
+        setStatus('聞いています…');
       } catch {
-        // すでに開始している場合は無視
+        // 既に開始中などの場合は無視（次のonendで再試行される）
       }
-    }
+    }, 300);
   };
 
   return rec;
@@ -172,6 +198,8 @@ function startListening() {
 
 function stopListening() {
   listening = false;
+  clearTimeout(restartTimer);
+  rapidRestartCount = 0;
   micBtn.classList.remove('active');
   micLabel.textContent = 'マイク開始';
   setStatus('待機中');
