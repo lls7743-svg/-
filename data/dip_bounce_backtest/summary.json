@@ -1,0 +1,15 @@
+{
+  "period_start": "2026-04-13T09:00:00+09:00",
+  "period_end": "2026-07-09T15:15:00+09:00",
+  "symbols_scanned": 159,
+  "drop_pct_threshold": 0.05,
+  "take_profit_pct": 0.01,
+  "entry_window_end_jst": "10:30:00",
+  "initial_cash": 1000000.0,
+  "final_equity": 993350.0,
+  "return_pct": -0.66,
+  "num_round_trips": 4,
+  "win_rate_pct": 50.0,
+  "total_realized_pnl": -6650.0,
+  "still_open_positions": 0
+}

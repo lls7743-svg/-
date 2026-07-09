@@ -1,0 +1,86 @@
+[
+  {
+    "time": "2026-05-25T10:15:00+09:00",
+    "symbol": "4755.T",
+    "side": "BUY",
+    "qty": 200,
+    "price": 739.2999877929688,
+    "cash_after": 852140.0024414062,
+    "pnl": null,
+    "reason": "dip_5pct"
+  },
+  {
+    "time": "2026-05-25T13:30:00+09:00",
+    "symbol": "4755.T",
+    "side": "SELL",
+    "qty": 200,
+    "price": 749.7999877929688,
+    "cash_after": 1002100.0,
+    "pnl": 2100.0,
+    "reason": "take_profit_1pct",
+    "entry_price": 739.2999877929688
+  },
+  {
+    "time": "2026-06-01T09:00:00+09:00",
+    "symbol": "7211.T",
+    "side": "BUY",
+    "qty": 500,
+    "price": 348.1000061035156,
+    "cash_after": 828049.9969482422,
+    "pnl": null,
+    "reason": "dip_5pct"
+  },
+  {
+    "time": "2026-06-01T09:15:00+09:00",
+    "symbol": "7201.T",
+    "side": "BUY",
+    "qty": 500,
+    "price": 373.1000061035156,
+    "cash_after": 641499.9938964844,
+    "pnl": null,
+    "reason": "dip_5pct"
+  },
+  {
+    "time": "2026-06-01T15:00:00+09:00",
+    "symbol": "7211.T",
+    "side": "SELL",
+    "qty": 500,
+    "price": 346.6000061035156,
+    "cash_after": 814799.9969482422,
+    "pnl": -750.0,
+    "reason": "day_trade_close",
+    "entry_price": 348.1000061035156
+  },
+  {
+    "time": "2026-06-01T15:00:00+09:00",
+    "symbol": "7201.T",
+    "side": "SELL",
+    "qty": 500,
+    "price": 375.1000061035156,
+    "cash_after": 1002350.0,
+    "pnl": 1000.0,
+    "reason": "day_trade_close",
+    "entry_price": 373.1000061035156
+  },
+  {
+    "time": "2026-06-22T10:15:00+09:00",
+    "symbol": "9501.T",
+    "side": "BUY",
+    "qty": 400,
+    "price": 497.29998779296875,
+    "cash_after": 803430.0048828125,
+    "pnl": null,
+    "reason": "dip_5pct"
+  },
+  {
+    "time": "2026-06-22T15:00:00+09:00",
+    "symbol": "9501.T",
+    "side": "SELL",
+    "qty": 400,
+    "price": 474.79998779296875,
+    "cash_after": 993350.0,
+    "pnl": -9000.0,
+    "reason": "day_trade_close",
+    "entry_price": 497.29998779296875
+  }
+]
