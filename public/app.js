@@ -35,6 +35,7 @@ let lastRestartAt = 0;
 let currentInterim = '';
 let interimUnchangedTicks = 0;
 let staleCheckTimer = null;
+let lastErrorShownAt = 0;
 
 consentCheck.addEventListener('change', () => {
   startBtn.disabled = !consentCheck.checked;
@@ -186,7 +187,16 @@ async function maybeRequestAdvice() {
         relationship: relationshipSelect.value,
       }),
     });
-    if (!res.ok) throw new Error(`status ${res.status}`);
+    if (!res.ok) {
+      let detail = `status ${res.status}`;
+      try {
+        const errBody = await res.json();
+        if (errBody?.error) detail += ` / ${errBody.error}`;
+      } catch {
+        // レスポンスがJSONでない場合は無視
+      }
+      throw new Error(detail);
+    }
     const data = await res.json();
     if (data.mood) {
       moodIndicator.dataset.mood = data.mood;
@@ -194,9 +204,16 @@ async function maybeRequestAdvice() {
     }
     if (data.advice) {
       addAdviceCard(data.advice);
+    } else {
+      setStatus('聞いています…（今回は特にアドバイスなし）');
     }
   } catch (err) {
     console.error('advice request failed', err);
+    const now2 = Date.now();
+    if (now2 - lastErrorShownAt > 15000) {
+      lastErrorShownAt = now2;
+      setStatus(`アドバイス取得エラー: ${err.message}`);
+    }
   } finally {
     adviceInFlight = false;
   }

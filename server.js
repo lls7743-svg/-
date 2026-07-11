@@ -65,8 +65,8 @@ app.post('/api/advice', async (req, res) => {
 
     res.json(parsed);
   } catch (err) {
-    console.error('advice generation failed:', err);
-    res.status(500).json({ error: 'advice generation failed' });
+    console.error('advice generation failed:', err.status, err.message, err.error ?? '');
+    res.status(500).json({ error: `advice generation failed: ${err.message}` });
   }
 });
 
@@ -114,8 +114,8 @@ app.post('/api/analyze-text', async (req, res) => {
 
     res.json(parsed);
   } catch (err) {
-    console.error('text analysis failed:', err);
-    res.status(500).json({ error: 'text analysis failed' });
+    console.error('text analysis failed:', err.status, err.message, err.error ?? '');
+    res.status(500).json({ error: `text analysis failed: ${err.message}` });
   }
 });
 
