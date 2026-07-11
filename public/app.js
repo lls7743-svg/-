@@ -9,6 +9,7 @@ const relationshipSelect = document.getElementById('relationshipSelect');
 const transcriptBox = document.getElementById('transcriptBox');
 const adviceFeed = document.getElementById('adviceFeed');
 const moodIndicator = document.getElementById('moodIndicator');
+const adviceStatusText = document.getElementById('adviceStatusText');
 
 const modeMicBtn = document.getElementById('modeMicBtn');
 const modeTextBtn = document.getElementById('modeTextBtn');
@@ -35,7 +36,6 @@ let lastRestartAt = 0;
 let currentInterim = '';
 let interimUnchangedTicks = 0;
 let staleCheckTimer = null;
-let lastErrorShownAt = 0;
 let lastCommittedSegment = '';
 let erroredSinceLastResult = false;
 
@@ -194,6 +194,8 @@ async function maybeRequestAdvice() {
   sinceLastAdviceBuffer = '';
   lastAdviceAt = now;
   adviceInFlight = true;
+  adviceStatusText.classList.remove('error');
+  adviceStatusText.textContent = '分析中…';
 
   try {
     const res = await fetch('/api/advice', {
@@ -221,16 +223,14 @@ async function maybeRequestAdvice() {
     }
     if (data.advice) {
       addAdviceCard(data.advice);
+      adviceStatusText.textContent = '';
     } else {
-      setStatus('聞いています…（今回は特にアドバイスなし）');
+      adviceStatusText.textContent = '今回は特にアドバイスなし（会話は分析できています）';
     }
   } catch (err) {
     console.error('advice request failed', err);
-    const now2 = Date.now();
-    if (now2 - lastErrorShownAt > 15000) {
-      lastErrorShownAt = now2;
-      setStatus(`アドバイス取得エラー: ${err.message}`);
-    }
+    adviceStatusText.classList.add('error');
+    adviceStatusText.textContent = `アドバイス取得エラー: ${err.message}`;
   } finally {
     adviceInFlight = false;
   }

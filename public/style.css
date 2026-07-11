@@ -242,6 +242,17 @@ body {
 .mood[data-mood="neutral"] { color: var(--neutral); }
 .mood[data-mood="caution"] { color: var(--caution); }
 
+.advice-status {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  min-height: 1.2em;
+  margin-bottom: 8px;
+}
+
+.advice-status.error {
+  color: var(--caution);
+}
+
 .advice-feed {
   display: flex;
   flex-direction: column;
