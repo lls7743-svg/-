@@ -36,6 +36,8 @@ let currentInterim = '';
 let interimUnchangedTicks = 0;
 let staleCheckTimer = null;
 let lastErrorShownAt = 0;
+let lastCommittedSegment = '';
+let erroredSinceLastResult = false;
 
 consentCheck.addEventListener('change', () => {
   startBtn.disabled = !consentCheck.checked;
@@ -69,14 +71,14 @@ function ensureRecognition() {
       const result = event.results[i];
       const text = result[0].transcript;
       if (result.isFinal) {
-        fullFinalTranscript += text;
-        sinceLastAdviceBuffer += text;
+        appendFinalSegment(text);
       } else {
         interim += text;
       }
     }
     currentInterim = interim;
     interimUnchangedTicks = 0;
+    erroredSinceLastResult = false;
     renderTranscript(interim);
     maybeRequestAdvice();
   };
@@ -88,6 +90,7 @@ function ensureRecognition() {
       stopListening();
     } else if (event.error === 'aborted' || event.error === 'no-speech' || event.error === 'network') {
       // モバイルのChromeでは無音・回線状況などでよく起こる。onendで自動再接続するため致命的ではない
+      erroredSinceLastResult = true;
       setStatus('聞いています…（再接続中）');
     } else {
       setStatus(`音声認識エラー: ${event.error}`);
@@ -97,8 +100,13 @@ function ensureRecognition() {
   rec.onend = () => {
     if (!listening) return;
 
-    // 中断時に確定していなかった発言も、失わずに確定分へ繰り入れる
-    commitInterim();
+    // エラーによる強制再接続の場合、話している途中の音声が新しいセッションで
+    // 再度拾われ直すことが多く、ここで確定させると同じセリフが重複してしまう。
+    // 本当に発話が止まって終了した場合のみ、確定していなかった分を繰り入れる。
+    if (!erroredSinceLastResult) {
+      commitInterim();
+    }
+    erroredSinceLastResult = false;
 
     const now = Date.now();
     // 短時間に何度も再起動を繰り返す場合は、マイクが実際には使えない状態とみなして止める
@@ -131,10 +139,19 @@ function ensureRecognition() {
   return rec;
 }
 
+function appendFinalSegment(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return;
+  // 再接続直後は直前と同じ内容を再度拾いがちなので、完全一致の連続重複は無視する
+  if (trimmed === lastCommittedSegment) return;
+  fullFinalTranscript += text;
+  sinceLastAdviceBuffer += text;
+  lastCommittedSegment = trimmed;
+}
+
 function commitInterim() {
   if (!currentInterim.trim()) return;
-  fullFinalTranscript += currentInterim;
-  sinceLastAdviceBuffer += currentInterim;
+  appendFinalSegment(currentInterim);
   currentInterim = '';
   interimUnchangedTicks = 0;
   renderTranscript('');
@@ -247,6 +264,8 @@ function startListening() {
     setStatus('聞いています…');
     currentInterim = '';
     interimUnchangedTicks = 0;
+    lastCommittedSegment = '';
+    erroredSinceLastResult = false;
     clearInterval(staleCheckTimer);
     staleCheckTimer = setInterval(checkStaleInterim, 2000);
   } catch (err) {
