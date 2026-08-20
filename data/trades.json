@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "time": "2026-08-20T09:41:41.970847+09:00",
+    "symbol": "5020.T",
+    "side": "BUY",
+    "qty": 100,
+    "price": 1294.5,
+    "cash_after": 870550.0,
+    "pnl": null,
+    "reason": "golden_cross"
+  }
+]

@@ -1,7 +1,14 @@
 {
-  "cash": 1000000.0,
+  "cash": 870550.0,
   "initial_cash": 1000000.0,
   "realized_pnl": 0.0,
-  "positions": {},
-  "last_updated": "2026-08-19T15:02:59.190699+09:00"
+  "positions": {
+    "5020.T": {
+      "qty": 100,
+      "entry_price": 1294.5,
+      "entry_time": "2026-08-20T09:41:41.970847+09:00",
+      "highwater": 1294.5
+    }
+  },
+  "last_updated": "2026-08-20T09:41:41.970847+09:00"
 }
