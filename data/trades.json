@@ -8,5 +8,16 @@
     "cash_after": 870550.0,
     "pnl": null,
     "reason": "golden_cross"
+  },
+  {
+    "time": "2026-08-20T15:29:20.640591+09:00",
+    "symbol": "5020.T",
+    "side": "SELL",
+    "qty": 100,
+    "price": 1300.5,
+    "cash_after": 1000600.0,
+    "pnl": 600.0,
+    "reason": "day_trade_close",
+    "entry_price": 1294.5
   }
 ]
